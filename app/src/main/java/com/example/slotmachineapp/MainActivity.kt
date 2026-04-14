@@ -69,6 +69,9 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
 
     var speed by remember { mutableFloatStateOf(1000f) }
 
+    var output by remember { mutableStateOf("") }
+    var mult by remember { mutableDoubleStateOf(0.0) }
+
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -115,6 +118,12 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
             )
         }
 
+        Text (
+            text = output,
+            fontSize = 40.sp,
+//            modifier = modifier.padding(bottom = 40.dp)
+        )
+
         //operations
         if (isCounting) {   //stop button
             Button (
@@ -123,6 +132,8 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                     countJobA?.cancel()
                     countJobB?.cancel()
                     countJobC?.cancel()
+                    output = winOrLose(countA, countB, countC).first
+                    mult = winOrLose(countA, countB, countC).second
                 },
                 modifier = modifier.padding(bottom = 40.dp)
             ) {
@@ -135,10 +146,10 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                     countJobA = coroutine.launch(Dispatchers.Default) {     //something that is run separate from the main activity.
                         while(true) {
                             if (countA == 3) {
-                                delay(speed.toLong())       //pauses every second; 1000ms = 1s
+                                delay(speed.toLong()/4)       //pauses every second; 1000ms = 1s
                                 countA = 0
                             } else {
-                                delay(speed.toLong())
+                                delay(speed.toLong()/4)
                                 countA++
                             }
                         }
@@ -157,7 +168,7 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                     countJobC = coroutine.launch(Dispatchers.Default) {     //something that is run separate from the main activity.
                         while(true) {
                             if (countC == 3) {
-                                delay(speed.toLong()/4)       //pauses every second; 1000ms = 1s
+                                delay(speed.toLong()/8)       //pauses every second; 1000ms = 1s
                                 countC = 0
                             } else {
                                 delay(speed.toLong()/8)
@@ -178,4 +189,44 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
 
 }
 
+fun winOrLose(a: Int, b: Int, c: Int): Pair<String, Double>  {
+    var strawCount = 0
+
+    //how many strawberries?
+    if (a == 0) {
+       strawCount++
+    }
+    if (b == 0) {
+        strawCount++
+    }
+    if (c == 0) {
+        strawCount++
+    }
+
+    //strawberry wins
+    if (strawCount == 1) {
+        return Pair("1 Strawberry x0.25", 0.25)
+    } else if (strawCount == 2) {
+        return Pair("2 Strawberries x0.75", 0.75)
+    } else if (strawCount == 3) {
+        return Pair("3 Strawberries x1.5", 1.5)
+    }
+    //blueberry, pear, and cherry win
+    if (a == 1 && b == 1 && c == 1) {
+        return Pair("3 Blueberries x3", 3.0)
+    } else if (a == 2 && b == 2 && c == 2) {
+        return Pair("3 Pears x5", 5.0)
+    } else if (a == 3 && b == 3 && c == 3) {
+        return Pair("3 Cherries x20", 20.0)
+    } else {
+        return Pair("Loser", 0.0)
+    }
+}
+
 //add a topAppBar to reset the app to zero. give the user the ability to make it count up or down (try radio buttons).
+/*
+strawberries = 0 = small win (1 strawberry = .25, 2 strawberries = .75, 3 strawberries = 1.5)
+blueberries = 1 (3 for 3x)
+pear = 2
+cherry = 3 = JACKPOT!
+*/
