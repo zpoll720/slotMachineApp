@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -33,6 +34,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.slotmachineapp.ui.theme.SlotMachineAppTheme
 //import com.example.counter.ui.theme.CounterTheme
 import kotlinx.coroutines.Dispatchers
@@ -234,8 +238,21 @@ speed
                 Text("Start!")
             }
         }
-
+        Row (
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.End,
+            modifier = modifier.fillMaxWidth().padding(end = 10.dp)
+        ) {
+            Button (
+                onClick = {
+                    countA++
+                }
+            ) {
+                Text("Extra Info")
+            }
+        }
     }
+
 
 }
 
@@ -272,6 +289,32 @@ fun winOrLose(a: Int, b: Int, c: Int): Pair<String, Double>  {
         return Pair("Loser", 0.0)
     }
 }
+
+
+@Composable
+fun MyAppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            HomeScreen(onNavigateToDetails = { navController.navigate("details") })
+        }
+        composable("details") {
+            DetailsScreen()
+        }
+    }
+}
+
+@Composable
+fun DetailsScreen() {
+    Text("Welcome to the new screen!")
+}
+
+@Composable
+fun HomeScreen(onNavigateToDetails: () -> Unit) {
+    TODO("Not yet implemented")
+}
+
 
 //add a topAppBar to reset the app to zero. give the user the ability to make it count up or down (try radio buttons).
 /*
