@@ -6,12 +6,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -27,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,7 +63,7 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
     var countB by remember { mutableIntStateOf(0) }
     var countC by remember { mutableIntStateOf(0) }
 
-    var isCounting by remember { mutableStateOf(false) }
+    var isCounting by remember { mutableIntStateOf(0) }
     val coroutine = rememberCoroutineScope()
     //has to specify its a job because it is getting set to null
     var countJobA: Job? by remember { mutableStateOf(null) }
@@ -87,7 +90,46 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.fillMaxWidth()
         ) {
-            Text (
+            Image (
+                if (countA == 0) {
+                    painterResource(id = R.drawable.strawberry)
+                } else if (countA == 1){
+                    painterResource(id = R.drawable.blueberry)
+                } else if (countA == 2) {
+                    painterResource(id = R.drawable.pear)
+                } else {
+                    painterResource(id = R.drawable.cherry)
+                },
+                contentDescription = "Slot Machine Wheel A",
+                modifier = modifier.size(120.dp)
+            )
+            Image (
+                if (countB == 0) {
+                painterResource(id = R.drawable.strawberry)
+            } else if (countB == 1){
+                painterResource(id = R.drawable.blueberry)
+            } else if (countB == 2) {
+                painterResource(id = R.drawable.pear)
+            } else {
+                painterResource(id = R.drawable.cherry)
+            },
+                contentDescription = "Slot Machine Wheel B",
+                modifier = modifier.size(120.dp)
+            )
+            Image (
+                if (countC == 0) {
+                painterResource(id = R.drawable.strawberry)
+            } else if (countC == 1){
+                painterResource(id = R.drawable.blueberry)
+            } else if (countC == 2) {
+                painterResource(id = R.drawable.pear)
+            } else {
+                painterResource(id = R.drawable.cherry)
+            },
+                contentDescription = "Slot Machine Wheel B",
+                modifier = modifier.size(120.dp)
+            )
+            /*Text (
 //            text = String.format("%.2f", count.toString()),
                 text = "$countA",
                 fontSize = 120.sp,
@@ -101,7 +143,7 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
 //            text = String.format("%.2f", count.toString()),
                 text = "$countC",
                 fontSize = 120.sp,
-            )
+            )*/
         }
 
         Column (
@@ -125,15 +167,23 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
         )
 
         //operations
-        if (isCounting) {   //stop button
+        if (isCounting > 0) {   //stop button
             Button (
                 onClick = {
-                    isCounting = false
-                    countJobA?.cancel()
-                    countJobB?.cancel()
-                    countJobC?.cancel()
-                    output = winOrLose(countA, countB, countC).first
-                    mult = winOrLose(countA, countB, countC).second
+                    if (isCounting == 3) {
+                        countJobA?.cancel()
+                    } else if (isCounting == 2) {
+                        countJobB?.cancel()
+                    } else if (isCounting == 1) {
+                        countJobC?.cancel()
+                    }
+
+                    isCounting--
+
+                    if (isCounting == 0) {
+                        output = winOrLose(countA, countB, countC).first
+                        mult = winOrLose(countA, countB, countC).second
+                    }
                 },
                 modifier = modifier.padding(bottom = 40.dp)
             ) {
@@ -142,14 +192,14 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
         } else {    //start button
             Button (
                 onClick = {
-                    isCounting = true
+                    isCounting = 3
                     countJobA = coroutine.launch(Dispatchers.Default) {     //something that is run separate from the main activity.
                         while(true) {
                             if (countA == 3) {
-                                delay(speed.toLong()/4)       //pauses every second; 1000ms = 1s
+                                delay(speed.toLong()/12)       //pauses every second; 1000ms = 1s
                                 countA = 0
                             } else {
-                                delay(speed.toLong()/4)
+                                delay(speed.toLong()/12)
                                 countA++
                             }
                         }
@@ -157,10 +207,10 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                     countJobB = coroutine.launch(Dispatchers.Default) {     //something that is run separate from the main activity.
                         while(true) {
                             if (countB == 3) {
-                                delay(speed.toLong()/2)       //pauses every second; 1000ms = 1s
+                                delay(speed.toLong()/9)       //pauses every second; 1000ms = 1s
                                 countB = 0
                             } else {
-                                delay(speed.toLong()/2)
+                                delay(speed.toLong()/9)
                                 countB++
                             }
                         }
@@ -168,15 +218,15 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                     countJobC = coroutine.launch(Dispatchers.Default) {     //something that is run separate from the main activity.
                         while(true) {
                             if (countC == 3) {
-                                delay(speed.toLong()/8)       //pauses every second; 1000ms = 1s
+                                delay(speed.toLong()/15)       //pauses every second; 1000ms = 1s
                                 countC = 0
                             } else {
-                                delay(speed.toLong()/8)
+                                delay(speed.toLong()/15)
                                 countC++
                             }
                         }
                     }
-
+speed
 
                 },
                 modifier = modifier.padding(bottom = 40.dp)
@@ -209,7 +259,7 @@ fun winOrLose(a: Int, b: Int, c: Int): Pair<String, Double>  {
     } else if (strawCount == 2) {
         return Pair("2 Strawberries x0.75", 0.75)
     } else if (strawCount == 3) {
-        return Pair("3 Strawberries x1.5", 1.5)
+        return Pair("3 Strawberries x1.25", 1.25)
     }
     //blueberry, pear, and cherry win
     if (a == 1 && b == 1 && c == 1) {
@@ -225,7 +275,7 @@ fun winOrLose(a: Int, b: Int, c: Int): Pair<String, Double>  {
 
 //add a topAppBar to reset the app to zero. give the user the ability to make it count up or down (try radio buttons).
 /*
-strawberries = 0 = small win (1 strawberry = .25, 2 strawberries = .75, 3 strawberries = 1.5)
+strawberries = 0 = small win (1 strawberry = .25, 2 strawberries = .75, 3 strawberries = 1.25)
 blueberries = 1 (3 for 3x)
 pear = 2
 cherry = 3 = JACKPOT!
