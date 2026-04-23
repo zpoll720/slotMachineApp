@@ -31,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,18 +54,35 @@ class MainActivity : ComponentActivity() {
         setContent {
             SlotMachineAppTheme {   //uses Theme.kt under ui.theme folder. if user is in dark mode, will put app into dark mode
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SlotMachineScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+//                    SlotMachineScreen(
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+                    val navController = rememberNavController()
+
+                    NavHost(navController = navController, startDestination = "slotMachine") {
+                        composable("slotMachine") {
+                            SlotMachineScreen(modifier = Modifier.padding(innerPadding), onNavigateToDetails = { navController.navigate("details") })
+                        }
+                        composable("details") {
+                            DetailsScreen(modifier = Modifier.padding(innerPadding), onNavigateToSlotMachine = { navController.navigate("slotMachine") })
+                        }
+                    }
                 }
             }
+
+
         }
     }
+
+
+
+
+
 }
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun SlotMachineScreen (modifier: Modifier = Modifier) {
+fun SlotMachineScreen (modifier: Modifier = Modifier, onNavigateToDetails: () -> Unit) {
     var countA by remember { mutableIntStateOf(0) }
     var countB by remember { mutableIntStateOf(0) }
     var countC by remember { mutableIntStateOf(0) }
@@ -230,7 +250,7 @@ fun SlotMachineScreen (modifier: Modifier = Modifier) {
                             }
                         }
                     }
-speed
+//                    speed
 
                 },
                 modifier = modifier.padding(bottom = 40.dp)
@@ -245,7 +265,7 @@ speed
         ) {
             Button (
                 onClick = {
-                    countA++
+                    onNavigateToDetails()
                 }
             ) {
                 Text("Extra Info")
@@ -295,31 +315,191 @@ fun winOrLose(a: Int, b: Int, c: Int): Pair<String, Double>  {
 fun MyAppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            HomeScreen(onNavigateToDetails = { navController.navigate("details") })
+    NavHost(navController = navController, startDestination = "slotMachine") {
+        composable("slotMachine") {
+            SlotMachineScreen(onNavigateToDetails = { navController.navigate("details") })
         }
         composable("details") {
-            DetailsScreen()
+            DetailsScreen(onNavigateToSlotMachine = { navController.navigate("slotMachine") })
         }
     }
 }
 
 @Composable
-fun DetailsScreen() {
-    Text("Welcome to the new screen!")
+fun DetailsScreen(modifier: Modifier = Modifier, onNavigateToSlotMachine: () -> Unit) {
+    Column (
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Text (
+            text = "Winning Combos!",
+            fontSize = 60.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 70.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 15.dp, bottom = 50.dp)
+        )
+        Column (
+
+        ) {
+            Row (
+
+            ) {
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Text (
+                    text = "1 Strawberry = x0.25",
+                    //                fontSize = 40.sp,
+                    modifier = Modifier
+                )
+            }
+            Row (
+
+            ) {
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Text (
+                    text = "2 Strawberries = x0.75",
+                    //                fontSize = 40.sp,
+                    modifier = Modifier
+                )
+            }
+            Row (
+
+            ) {
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Image (
+                    painter = painterResource(id = R.drawable.strawberry),
+                    contentDescription = "Strawberry",
+                    modifier = Modifier
+                )
+                Text (
+                    text = "3 Strawberries = x1.25",
+                    //                fontSize = 40.sp,
+                    modifier = Modifier
+                )
+            }
+        }
+
+        Row (
+            modifier = Modifier.padding(top = 10.dp)
+        ) {
+            Image (
+                painter = painterResource(id = R.drawable.blueberry),
+                contentDescription = "Blueberry",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.blueberry),
+                contentDescription = "Blueberry",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.blueberry),
+                contentDescription = "Blueberry",
+                modifier = Modifier
+            )
+            Text (
+                text = "3 Blueberries = x3",
+                //                fontSize = 40.sp,
+                modifier = Modifier
+            )
+        }
+        Row (
+
+        ) {
+            Image (
+                painter = painterResource(id = R.drawable.pear),
+                contentDescription = "Pear",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.pear),
+                contentDescription = "Pear",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.pear),
+                contentDescription = "Pear",
+                modifier = Modifier
+            )
+            Text (
+                text = "3 Pears = x5",
+                //                fontSize = 40.sp,
+                modifier = Modifier
+            )
+        }
+        Row (
+
+        ) {
+            Image (
+                painter = painterResource(id = R.drawable.cherry),
+                contentDescription = "Cherry",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.cherry),
+                contentDescription = "Cherry",
+                modifier = Modifier
+            )
+            Image (
+                painter = painterResource(id = R.drawable.cherry),
+                contentDescription = "Cherry",
+                modifier = Modifier
+            )
+            Text (
+                text = "3 Cherrys = x20",
+                //                fontSize = 40.sp,
+                modifier = Modifier
+            )
+        }
+        Row (
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)
+        ) {
+            Button (
+                onClick = {
+                    onNavigateToSlotMachine()
+                },
+                modifier = Modifier
+            ) {
+                Text("Back to Slots!")
+            }
+        }
+
+
+    }
 }
 
-@Composable
-fun HomeScreen(onNavigateToDetails: () -> Unit) {
-    TODO("Not yet implemented")
-}
+
 
 
 //add a topAppBar to reset the app to zero. give the user the ability to make it count up or down (try radio buttons).
 /*
 strawberries = 0 = small win (1 strawberry = .25, 2 strawberries = .75, 3 strawberries = 1.25)
 blueberries = 1 (3 for 3x)
-pear = 2
-cherry = 3 = JACKPOT!
+pear = 2  x5
+cherry = 3 = JACKPOT!  x20
 */
